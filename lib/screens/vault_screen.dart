@@ -34,6 +34,38 @@ class _VaultScreenState extends State<VaultScreen> {
     });
   }
 
+void _showAppOptions(BuildContext context, Application app) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.grey[900],
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      builder: (context) {
+        return SafeArea(
+          child: Wrap(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Text(
+                  app.appName,
+                  style: const TextStyle(color: Colors.grey, fontSize: 14, fontWeight: FontWeight.bold),
+                ),
+              ),
+              ListTile(
+                leading: const Icon(Icons.info_outline, color: Colors.white),
+                title: Text('app_info'.tr(), style: const TextStyle(color: Colors.white)),
+                onTap: () {
+                  Navigator.pop(context);
+                  DeviceApps.openAppSettings(app.packageName); 
+                },
+              ),
+              const SizedBox(height: 10), 
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -60,6 +92,9 @@ class _VaultScreenState extends State<VaultScreen> {
                   title: Text(app.appName, style: const TextStyle(color: Colors.white)),
                   onTap: () {
                     DeviceApps.openApp(app.packageName);
+                  },
+                  onLongPress: () {
+                    _showAppOptions(context, app);
                   },
                 );
               },

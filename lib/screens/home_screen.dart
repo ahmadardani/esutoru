@@ -52,34 +52,36 @@ class _HomeScreenState extends State<HomeScreen> {
     super.dispose();
   }
 
-  void _showAppSelector(int slotIndex) {
+void _showAppSelector(int slotIndex) {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.grey[900],
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
       builder: (context) {
         if (isLoadingApps) {
-          return const Center(child: CircularProgressIndicator(color: Colors.white));
+          return const SafeArea(child: Center(child: CircularProgressIndicator(color: Colors.white)));
         }
         
-        return ListView.builder(
-          padding: const EdgeInsets.all(20),
-          itemCount: allApps.length,
-          itemBuilder: (context, index) {
-            final app = allApps[index];
-            return ListTile(
-              leading: app is ApplicationWithIcon 
-                  ? Image.memory(app.icon, width: 40, height: 40)
-                  : const Icon(Icons.apps, color: Colors.white),
-              title: Text(app.appName, style: const TextStyle(color: Colors.white)),
-              onTap: () {
-                setState(() {
-                  favoriteApps[slotIndex] = app;
-                });
-                Navigator.pop(context);
-              },
-            );
-          },
+        return SafeArea(
+          child: ListView.builder(
+            padding: const EdgeInsets.all(20),
+            itemCount: allApps.length,
+            itemBuilder: (context, index) {
+              final app = allApps[index];
+              return ListTile(
+                leading: app is ApplicationWithIcon 
+                    ? Image.memory(app.icon, width: 40, height: 40)
+                    : const Icon(Icons.apps, color: Colors.white),
+                title: Text(app.appName, style: const TextStyle(color: Colors.white)),
+                onTap: () {
+                  setState(() {
+                    favoriteApps[slotIndex] = app;
+                  });
+                  Navigator.pop(context);
+                },
+              );
+            },
+          ),
         );
       },
     );
