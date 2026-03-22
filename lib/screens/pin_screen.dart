@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'vault_screen.dart';
 
 class PinScreen extends StatefulWidget {
@@ -11,7 +12,20 @@ class PinScreen extends StatefulWidget {
 
 class _PinScreenState extends State<PinScreen> {
   String enteredPin = "";
-  final String correctPin = "1234";
+  String correctPin = "1234";
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSavedPin();
+  }
+
+  Future<void> _loadSavedPin() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      correctPin = prefs.getString('vault_pin') ?? "1234";
+    });
+  }
 
   void _onNumPress(String num) {
     if (enteredPin.length < 4) {

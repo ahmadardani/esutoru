@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:device_apps/device_apps.dart';
+import 'settings_screen.dart';
 
 class VaultScreen extends StatefulWidget {
   const VaultScreen({super.key});
@@ -34,7 +35,7 @@ class _VaultScreenState extends State<VaultScreen> {
     });
   }
 
-void _showAppOptions(BuildContext context, Application app) {
+  void _showAppOptions(BuildContext context, Application app) {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.grey[900],
@@ -75,7 +76,12 @@ void _showAppOptions(BuildContext context, Application app) {
         actions: [
           IconButton(
             icon: const Icon(Icons.settings),
-            onPressed: () => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('open_settings'.tr()))),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const SettingsScreen()),
+              );
+            },
           )
         ],
       ),

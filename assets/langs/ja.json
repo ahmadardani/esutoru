@@ -6,5 +6,7 @@
   "cancel": "キャンセル",
   "app_vault": "アプリ保管庫",
   "open_settings": "設定を開く",
-  "app_info": "アプリ情報 / アンインストール"
+  "app_info": "アプリ情報 / アンインストール",
+  "change_pin": "PINを変更",
+  "enter_new_pin": "新しいPINを入力"
 }

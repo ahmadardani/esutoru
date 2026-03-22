@@ -6,5 +6,7 @@
   "cancel": "Cancel",
   "app_vault": "App Vault",
   "open_settings": "Open Settings",
-  "app_info": "App Info / Uninstall"
+  "app_info": "App Info / Uninstall",
+  "change_pin": "Change PIN",
+  "enter_new_pin": "Enter New PIN"
 }
