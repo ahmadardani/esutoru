@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:device_apps/device_apps.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:async';
 import 'pin_screen.dart';
 
@@ -16,13 +17,11 @@ class _HomeScreenState extends State<HomeScreen> {
   Timer? _timer;
   
   List<Application?> favoriteApps = List.filled(5, null);
-  List<Application> allApps = [];
-  bool isLoadingApps = true;
 
   @override
   void initState() {
     super.initState();
-    _loadApps();
+    _loadFavoriteApps();
     
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       setState(() {
@@ -31,19 +30,26 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  Future<void> _loadApps() async {
-    List<Application> apps = await DeviceApps.getInstalledApplications(
-      includeAppIcons: true,
-      includeSystemApps: true,
-      onlyAppsWithLaunchIntent: true,
-    );
+  Future<void> _loadFavoriteApps() async {
+    final prefs = await SharedPreferences.getInstance();
+    List<String> savedPackages = prefs.getStringList('favorite_apps') ?? ['', '', '', '', ''];
+    List<Application?> loadedApps = List.filled(5, null);
 
-    apps.sort((a, b) => a.appName.toLowerCase().compareTo(b.appName.toLowerCase()));
+    for (int i = 0; i < 5; i++) {
+      if (savedPackages[i].isNotEmpty) {
+        try {
+          loadedApps[i] = await DeviceApps.getApp(savedPackages[i], true);
+        } catch (e) {
+          
+        }
+      }
+    }
 
-    setState(() {
-      allApps = apps;
-      isLoadingApps = false;
-    });
+    if (mounted) {
+      setState(() {
+        favoriteApps = loadedApps;
+      });
+    }
   }
 
   @override
@@ -52,38 +58,33 @@ class _HomeScreenState extends State<HomeScreen> {
     super.dispose();
   }
 
-void _showAppSelector(int slotIndex) {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.grey[900],
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
-      builder: (context) {
-        if (isLoadingApps) {
-          return const SafeArea(child: Center(child: CircularProgressIndicator(color: Colors.white)));
-        }
-        
-        return SafeArea(
-          child: ListView.builder(
-            padding: const EdgeInsets.all(20),
-            itemCount: allApps.length,
-            itemBuilder: (context, index) {
-              final app = allApps[index];
-              return ListTile(
-                leading: app is ApplicationWithIcon 
-                    ? Image.memory(app.icon, width: 40, height: 40)
-                    : const Icon(Icons.apps, color: Colors.white),
-                title: Text(app.appName, style: const TextStyle(color: Colors.white)),
-                onTap: () {
-                  setState(() {
-                    favoriteApps[slotIndex] = app;
-                  });
-                  Navigator.pop(context);
-                },
-              );
-            },
+  Widget _buildAppButton(Application app) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(10),
+        onTap: () {
+          DeviceApps.openApp(app.packageName);
+        },
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(vertical: 15),
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.grey.withOpacity(0.3)),
+            borderRadius: BorderRadius.circular(10),
           ),
-        );
-      },
+          child: Center(
+            child: Text(
+              app.appName,
+              style: const TextStyle(
+                fontSize: 16,
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 
@@ -92,6 +93,9 @@ void _showAppSelector(int slotIndex) {
     String langCode = context.locale.languageCode;
     String formattedTime = DateFormat('HH:mm').format(_currentTime);
     String formattedDate = DateFormat('EEEE, d MMMM yyyy', langCode).format(_currentTime);
+
+    final validApps = favoriteApps.whereType<Application>().toList();
+    final emptyCount = 5 - validApps.length;
 
     return Scaffold(
       body: SafeArea(
@@ -106,46 +110,33 @@ void _showAppSelector(int slotIndex) {
 
             const Spacer(flex: 2),
 
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 40),
-              child: Column(
-                children: List.generate(5, (index) {
-                  final app = favoriteApps[index];
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 10),
-                    child: InkWell(
-                      borderRadius: BorderRadius.circular(10),
-                      onTap: () {
-                        if (app == null) {
-                          _showAppSelector(index);
-                        } else {
-                          DeviceApps.openApp(app.packageName);
-                        }
-                      },
-                      onLongPress: () {
-                        if (app != null) setState(() => favoriteApps[index] = null);
-                      },
-                      child: Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.symmetric(vertical: 15),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey.withOpacity(0.3)),
-                          borderRadius: BorderRadius.circular(10),
+            SizedBox(
+              height: 350, 
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 40),
+                child: validApps.isEmpty
+                    ? Center(
+                        child: Text(
+                          'no_apps_yet'.tr(),
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: Colors.grey[600], fontSize: 14),
                         ),
-                        child: Center(
-                          child: Text(
-                            app?.appName ?? 'add_app'.tr(),
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: app != null ? Colors.white : Colors.grey,
-                              fontWeight: app != null ? FontWeight.bold : FontWeight.normal,
+                      )
+                    : Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          ...validApps.map((app) => _buildAppButton(app)),
+                          
+                          if (emptyCount > 0)
+                            Padding(
+                              padding: const EdgeInsets.only(top: 10),
+                              child: Text(
+                                'empty_slots'.tr(args: [emptyCount.toString()]),
+                                style: TextStyle(color: Colors.grey[700], fontSize: 12),
+                              ),
                             ),
-                          ),
-                        ),
+                        ],
                       ),
-                    ),
-                  );
-                }),
               ),
             ),
 
@@ -153,7 +144,18 @@ void _showAppSelector(int slotIndex) {
 
             IconButton(
               icon: const Icon(Icons.lock_outline, color: Colors.grey, size: 30),
-              onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const PinScreen())),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => PinScreen(
+                      onReturn: () {
+                        if (mounted) _loadFavoriteApps();
+                      },
+                    ),
+                  ),
+                );
+              },
             ),
             const SizedBox(height: 20),
           ],

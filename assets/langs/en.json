@@ -7,6 +7,14 @@
   "app_vault": "App Vault",
   "open_settings": "Open Settings",
   "app_info": "App Info / Uninstall",
+  "settings": "Settings",
   "change_pin": "Change PIN",
-  "enter_new_pin": "Enter New PIN"
+  "enter_new_pin": "Enter 4-digit new PIN",
+  "pin_changed": "PIN successfully changed!",
+  "pin_length_error": "PIN must be 4 digits!",
+  "home_apps_settings": "Home Screen Apps",
+  "select_app": "Select App",
+  "no_app_selected": "No app selected",
+  "no_apps_yet": "No apps yet. Add them in Settings.",
+  "empty_slots": "{} empty slots left"
 }

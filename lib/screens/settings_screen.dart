@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'home_apps_settings_screen.dart'; 
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -71,6 +72,17 @@ class SettingsScreen extends StatelessWidget {
             leading: const Icon(Icons.lock_reset, color: Colors.white),
             title: Text('change_pin'.tr(), style: const TextStyle(color: Colors.white)),
             onTap: () => _showChangePinDialog(context),
+          ),
+          const Divider(color: Colors.white12),
+          ListTile(
+            leading: const Icon(Icons.apps, color: Colors.white),
+            title: Text('home_apps_settings'.tr(), style: const TextStyle(color: Colors.white)),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const HomeAppsSettingsScreen()),
+              );
+            },
           ),
         ],
       ),

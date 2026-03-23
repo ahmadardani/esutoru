@@ -4,7 +4,9 @@ import 'package:device_apps/device_apps.dart';
 import 'settings_screen.dart';
 
 class VaultScreen extends StatefulWidget {
-  const VaultScreen({super.key});
+  final VoidCallback? onReturn; 
+
+  const VaultScreen({super.key, this.onReturn});
 
   @override
   State<VaultScreen> createState() => _VaultScreenState();
@@ -18,6 +20,12 @@ class _VaultScreenState extends State<VaultScreen> {
   void initState() {
     super.initState();
     _loadAllApps();
+  }
+
+  @override
+  void dispose() {
+    widget.onReturn?.call(); 
+    super.dispose();
   }
 
   Future<void> _loadAllApps() async {

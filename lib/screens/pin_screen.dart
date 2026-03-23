@@ -4,7 +4,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'vault_screen.dart';
 
 class PinScreen extends StatefulWidget {
-  const PinScreen({super.key});
+  final VoidCallback? onReturn; 
+
+  const PinScreen({super.key, this.onReturn});
 
   @override
   State<PinScreen> createState() => _PinScreenState();
@@ -42,7 +44,10 @@ class _PinScreenState extends State<PinScreen> {
 
   void _checkPin() {
     if (enteredPin == correctPin) {
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const VaultScreen()));
+      Navigator.pushReplacement(
+        context, 
+        MaterialPageRoute(builder: (context) => VaultScreen(onReturn: widget.onReturn))
+      );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('wrong_pin'.tr()), backgroundColor: Colors.red));
       setState(() => enteredPin = "");

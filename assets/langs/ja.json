@@ -7,6 +7,14 @@
   "app_vault": "アプリ保管庫",
   "open_settings": "設定を開く",
   "app_info": "アプリ情報 / アンインストール",
+  "settings": "設定",
   "change_pin": "PINを変更",
-  "enter_new_pin": "新しいPINを入力"
+  "enter_new_pin": "新しい4桁のPINを入力",
+  "pin_changed": "PINが変更されました！",
+  "pin_length_error": "PINは4桁である必要があります！",
+  "home_apps_settings": "ホーム画面のアプリ",
+  "select_app": "アプリを選択",
+  "no_app_selected": "アプリがありません",
+  "no_apps_yet": "アプリがありません。設定で追加してください。",
+  "empty_slots": "残り {} スロット"
 }
